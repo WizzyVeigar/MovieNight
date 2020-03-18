@@ -5,10 +5,8 @@ using System.Data.SqlClient;
 
 namespace MovieNight
 {
-    //Everything SQL related
     class DalManager
     {
-
         private string connectionString = "Server=DESKTOP-M6E4F8M;Database=MovieNight;User Id=caustic;Password=kage123";
 
         public string ConnectionString
