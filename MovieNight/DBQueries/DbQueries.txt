@@ -9,19 +9,19 @@ drop table if exists Starring, Genre, Movie, genreType, Actor;
 
 create table Actor(
 actorId smallint primary key identity(1,1),
-firstName varchar not null,
-lastName varchar
+firstName varchar(255) not null,
+lastName varchar(700)
 )
 
 create table genreType(
 genreId smallint primary key identity(1,1),
-genreName varchar not null
+genreName varchar(100) not null
 )
 
 create table Movie(
 movieId smallint primary key identity(1,1),
 release date,
-title varchar not null,
+title varchar(300) not null,
 movieDescription text
 )
 
@@ -30,10 +30,14 @@ genreId smallint,
 movieId smallint
 
 constraint FK_GenregenreId foreign key (genreId)
-references genreType(genreId),
+references genreType(genreId)
+ON delete cascade
+ON update cascade,
 
 constraint FK_GenremovieId foreign key (movieId)
-references Movie(movieId),
+references Movie(movieId)
+ON Delete cascade
+On update cascade ,
 
 Constraint PK_MovieGenres Primary key (genreId, movieID)
 )
@@ -43,10 +47,14 @@ movieId smallint,
 actorId smallint
 
 constraint FK_StarringMovieId foreign key (movieId)
-references Movie(movieId),
+references Movie(movieId)
+On delete cascade
+On update cascade,
 
 constraint FK_StarringActorId foreign key (actorId)
-references Actor(actorId),
+references Actor(actorId)
+On delete cascade
+On update cascade,
 
 Constraint PK_MovieActors primary key (movieId, ActorId)
 )

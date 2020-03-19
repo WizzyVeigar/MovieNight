@@ -8,11 +8,13 @@ namespace MovieNight
         static void Main(string[] args)
         {
             MovieManager movieManager = new MovieManager();
+            List<Actor> actors = movieManager.GetActors();
+            List<Movie> movies = movieManager.GetMovies();
+            List<Genre> genres = movieManager.GetGenres();
 
             while (true)
             {
                 Console.Clear();
-
                 Console.WriteLine("What would you like to do?.." +
                     "\n" +
                     "\n" +
@@ -36,13 +38,43 @@ namespace MovieNight
                 Console.Clear();
                 switch (str)
                 {
+                    #region CreateSection
                     case "1":
                     {
                         Console.WriteLine("Enter First name");
                         string fn = Console.ReadLine();
                         Console.WriteLine("Enter Last name");
                         string ln = Console.ReadLine();
-                        Console.WriteLine(movieManager.InsertActor(new Actor(fn, ln)).GetFullName() + " has been added");
+                        Actor actor = new Actor(fn, ln);
+
+                        while (true)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("What movies is this actor in? (Type done if you are finished)\n");
+                            if (Console.ReadLine().ToLower() == "done")
+                            {
+                                break;
+                            }
+                            for (int i = 0; i < movies.Count; i++)
+                            {
+                                Console.WriteLine(movies[i].Title + "    " + movies[i].ReleaseYear);
+                            }
+                            str = "";
+                            while (string.IsNullOrWhiteSpace(str))
+                            {
+                                str = Console.ReadLine();
+                            }
+                            for (int i = 0; i < movies.Count; i++)
+                            {
+                                if (str.ToLower() == movies[i].Title.ToLower())
+                                {
+                                    actor.StarringIn.Add(movies[i]);
+                                    break;
+                                }
+                            }
+                        }
+                        Console.WriteLine(movieManager.InsertActor(actor).GetFullName() + " has been added");
+                        actors.Add(actor);
                         break;
 
                     }
@@ -86,64 +118,177 @@ namespace MovieNight
                                 }
                             }
                         }
-
                         Console.WriteLine(movieManager.InsertMovie(movie).Title + " has been added");
+                        movies.Add(movie);
                         break;
                     }
                     case "3":
                     {
                         Console.WriteLine("Enter Genre name");
-                        string genre = Console.ReadLine();
-                        Console.WriteLine(movieManager.InsertGenre(new Genre(genre)).GenreName + " has been added");
+                        Genre genre = new Genre(Console.ReadLine());
+                        Console.WriteLine(movieManager.InsertGenre(genre).GenreName + " has been added");
+                        genres.Add(genre);
                         break;
                     }
+                    #endregion
+                    #region UpdateSection
                     case "4":
                     {
+                        Console.WriteLine("Which actor needs an update?");
+                        foreach (Actor actor in actors)
+                        {
+                            Console.WriteLine(actor.ActorId + "  " + actor.GetFullName());
+                        }
+                        try
+                        {
+                            for (int i = 0; i < actors.Count; i++)
+                            {
+                                if (int.Parse(Console.ReadLine()) == actors[i].ActorId)
+                                {
+                                    Console.WriteLine("Enter First name");
+                                    actors[i].FirstName = Console.ReadLine();
 
+                                    Console.WriteLine("Enter Last name");
+                                    actors[i].LastName = Console.ReadLine();
+
+                                    Console.WriteLine(movieManager.UpdateActor(actors[i]));
+                                    break;
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                            Console.WriteLine("Something went wrong! try again");
+                        }
                         break;
                     }
                     case "5":
                     {
-
+                        Console.WriteLine("Which movie needs an update?");
+                        foreach (Movie movie in movies)
+                        {
+                            Console.WriteLine(movie.MovieId + "  " + movie.Title);
+                        }
+                        try
+                        {
+                            for (int i = 0; i < movies.Count; i++)
+                            {
+                                if (int.Parse(Console.ReadLine()) == movies[i].MovieId)
+                                {
+                                    Console.WriteLine("What is the title?");
+                                    movies[i].Title = Console.ReadLine();
+                                    Console.WriteLine("What date was it released? (YYYY-MM-DD)");
+                                    movies[i].ReleaseYear = Console.ReadLine();
+                                    Console.WriteLine("What is the description?");
+                                    movies[i].Description = Console.ReadLine();
+                                    movieManager.UpdateMovie(movies[i]);
+                                }
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("Something went wrong! try again");
+                        }
                         break;
                     }
                     case "6":
                     {
+                        Console.WriteLine("Which genre needs an update?");
+                        foreach (Genre genre in genres)
+                        {
+                            Console.WriteLine(genre.GenreId + "  " + genre.GenreName);
+                        }
+                        try
+                        {
+                            for (int i = 0; i < genres.Count; i++)
+                            {
+                                Console.WriteLine("Enter Genre name to update");
 
+                                if (int.Parse(Console.ReadLine()) == genres[i].GenreId)
+                                {
+                                    Console.WriteLine("Enter new genre name");
+                                    genres[i].GenreName = Console.ReadLine();
+                                    Console.WriteLine(movieManager.UpdateGenre(genres[i]));
+                                }
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("Something went wrong! try again");
+                        }
                         break;
                     }
+                    #endregion
+                    #region deleteSection
                     case "7":
                     {
-                        Console.WriteLine("Which Actor would you like to delete?");
-                        foreach (Actor actor in movieManager.GetActors())
+                        Console.WriteLine("Which Actor would you like to delete? (use their ID)");
+                        foreach (Actor actor in actors)
                         {
-                            Console.WriteLine(actor.ActorId + "  " + actor.GetFullName() + "\n");
+                            Console.WriteLine(actor.ActorId + "  " + actor.GetFullName());
+                        }
+                        try
+                        {
+                            int input = int.Parse(Console.ReadLine());
+                            for (int i = 0; i < actors.Count; i++)
+                            {
+                                if (input == actors[i].ActorId)
+                                    Console.WriteLine(movieManager.DeleteActor(actors[i]));
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("Something went wrong! try again");
                         }
                         break;
                     }
                     case "8":
                     {
-                        Console.WriteLine("Which Movie would you like to delete?");
-                        foreach (Movie movie in movieManager.GetMovies())
+                        Console.WriteLine("Which Movie would you like to delete? (use their ID)");
+                        foreach (Movie movie in movies)
                         {
-                            Console.WriteLine(movie.MovieId + "  " + movie.Title + "\n");
+                            Console.WriteLine(movie.MovieId + "  " + movie.Title);
+                        }
+                        try
+                        {
+                            int input = int.Parse(Console.ReadLine());
+                            for (int i = 0; i < movies.Count; i++)
+                            {
+                                if (input == movies[i].MovieId)
+                                    movieManager.DeleteMovie(movies[i]);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("Something went wrong! try again");
                         }
 
                         break;
                     }
                     case "9":
                     {
-
-                        Console.WriteLine("Which genre would you like to delete?");
-                        foreach (Genre genre in movieManager.GetGenres())
+                        Console.WriteLine("Which Genre would you like to delete? (use their ID)");
+                        foreach (Genre genre in genres)
                         {
-                            Console.WriteLine(genre.GenreName + "\n");
+                            Console.WriteLine(genre.GenreId + "  " + genre.GenreName);
                         }
-
-                        //movieManager.DeleteGenre()
+                        try
+                        {
+                            int input = int.Parse(Console.ReadLine());
+                            for (int i = 0; i < genres.Count; i++)
+                            {
+                                if (input == genres[i].GenreId)
+                                    movieManager.DeleteGenre(genres[i]);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("Something went wrong! try again");
+                        }
                         break;
                     }
-
+                    #endregion
                     default:
                         Console.WriteLine("Wrong input!");
                         break;

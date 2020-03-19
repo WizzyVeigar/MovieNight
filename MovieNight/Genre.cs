@@ -20,14 +20,6 @@ namespace MovieNight
             set { genreName = value; }
         }
 
-        private List<Movie> movies = new List<Movie>();
-
-        public List<Movie> Movies
-        {
-            get { return movies; }
-            set { movies = value; }
-        }
-
         public Genre(int genreId, string genreName)
         {
             GenreId = genreId;

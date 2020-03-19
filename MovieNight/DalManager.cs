@@ -53,8 +53,6 @@ namespace MovieNight
             }
         }
 
-
-
         /// <summary>
         /// Gets all movies containing <paramref name="keyword"/>
         /// </summary>
@@ -222,7 +220,27 @@ namespace MovieNight
                 return movies;
             }
         }
+        /// <summary>
+        /// Inserts <paramref name="a"/> into films, chaining those references together in the Starring table
+        /// </summary>
+        /// <param name="a"></param>
+        public void InsertActorInFilms(Actor a)
+        {
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("insert into Starring(movieId, actorId) values (@movieId, @actorId)", connection);
 
+                for (int i = 0; i < a.StarringIn.Count; i++)
+                {
+                    cmd.Parameters.Add(new SqlParameter("@movieId", a.StarringIn[i].MovieId));
+                    cmd.Parameters.Add(new SqlParameter("@actorId", a.ActorId));
+                    cmd.ExecuteNonQuery();
+                    cmd.Parameters.Clear();
+                }
+            }
+
+        }
         /// <summary>
         /// Inserts an Actor into the db
         /// </summary>
@@ -237,10 +255,8 @@ namespace MovieNight
 
                 cmd.Parameters.Add(new SqlParameter("@fn", a.FirstName));
                 cmd.Parameters.Add(new SqlParameter("@ln", a.LastName));
-                cmd.ExecuteNonQuery();
 
                 a.ActorId = (int)(short)cmd.ExecuteScalar();
-
             }
             return a;
         }
@@ -307,33 +323,103 @@ namespace MovieNight
             }
         }
 
-
-        internal string UpdateActor(Actor a)
+        /// <summary>
+        /// updates an existing Actor with information from <paramref name="a"/>
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        public string UpdateActor(Actor a)
         {
-            throw new NotImplementedException();
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("update Actor Set firstName = @fn, lastName = @ln where actorId = @actorId", connection);
+
+                cmd.Parameters.Add(new SqlParameter("@actorId", a.ActorId));
+                cmd.Parameters.Add(new SqlParameter("@fn", a.FirstName));
+                cmd.Parameters.Add(new SqlParameter("@ln", a.LastName));
+                cmd.ExecuteNonQuery();
+            }
+            return a.GetFullName() + " was updated";
         }
-
-        internal string UpdateMovie(Movie m)
+        /// <summary>
+        /// updates an existing Movie with information from <paramref name="m"/>
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public string UpdateMovie(Movie m)
         {
-            throw new NotImplementedException();
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("update Movie Set title = @title, release = @release, movieDescription = @desc where movieId = @movieId", connection);
+
+                cmd.Parameters.Add(new SqlParameter("@movieId", m.MovieId));
+                cmd.Parameters.Add(new SqlParameter("@title", m.Title));
+                cmd.Parameters.Add(new SqlParameter("@release", m.ReleaseYear));
+                cmd.Parameters.Add(new SqlParameter("@desc", m.Description));
+                cmd.ExecuteNonQuery();
+
+            }
+            return m.Title + " was updated";
         }
-
-        internal string UpdateGenre(Genre g)
+        /// <summary>
+        /// updates an existing Genre with information from <paramref name="g"/>
+        /// </summary>
+        /// <param name="g"></param>
+        /// <returns></returns>
+        public string UpdateGenre(Genre g)
         {
-            throw new NotImplementedException();
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("update genreType Set genreName = @gname where genreId = @genreId", connection);
+
+                cmd.Parameters.Add(new SqlParameter("@genreId", g.GenreId));
+                cmd.Parameters.Add(new SqlParameter("@gname", g.GenreName));
+                cmd.ExecuteNonQuery();
+            }
+            return g.GenreName + " was updated";
         }
 
         public string DeleteActor(Actor a)
         {
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("delete from Actor where actorId = @actorId", connection);
+
+                cmd.Parameters.Add(new SqlParameter("@actorId", a.ActorId));
+                cmd.ExecuteNonQuery();
+
+            }
             return a.GetFullName() + " was deleted";
         }
         public string DeleteMovie(Movie m)
         {
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("delete from Movie where movieId = @movieId", connection);
+
+                cmd.Parameters.Add(new SqlParameter("@movieId", m.MovieId));
+                cmd.ExecuteNonQuery();
+
+            }
             return m.Title + " was deleted";
         }
         public string DeleteGenre(Genre g)
         {
-            return g.GenreName + " was deleted"; 
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("delete from genreType where genreId = @genreId", connection);
+
+                cmd.Parameters.Add(new SqlParameter("@genreId", g.GenreId));
+                cmd.ExecuteNonQuery();
+
+            }
+            return g.GenreName + " was deleted";
         }
     }
 }

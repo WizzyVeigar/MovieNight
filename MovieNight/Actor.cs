@@ -33,6 +33,15 @@ namespace MovieNight
             set { actorId = value; }
         }
 
+        private List<Movie> starringIn= new List<Movie>(); 
+
+        public List<Movie> StarringIn
+        {
+            get { return starringIn; }
+            set { starringIn = value; }
+        }
+
+
         public Actor(string firstName, string lastName)
         {
             FirstName = firstName;
