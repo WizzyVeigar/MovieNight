@@ -39,5 +39,15 @@ namespace MovieNight
             LastName = lastName;
             ActorId = increment++;
         }
+
+        public Actor(string firstName, string lastName, int actorId) : this(firstName, lastName)
+        {
+            ActorId = actorId;
+        }
+
+        public string GetFullName()
+        {
+            return FirstName + " " + LastName;
+        }
     }
 }

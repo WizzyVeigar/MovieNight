@@ -40,5 +40,15 @@ namespace MovieNight
         {
            return DalManager.Instance.GetGenresOnMovies(movies);
         }
+
+        public Actor InsertActor(Actor a)
+        {
+            return DalManager.Instance.InsertActor(a);
+        }
+
+        public Movie InsertMovie(Movie m)
+        {
+            return DalManager.Instance.InsertMovie(m);
+        }
     }
 }

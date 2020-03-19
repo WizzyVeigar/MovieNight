@@ -104,7 +104,7 @@ namespace MovieNight
                 SqlParameter sp = new SqlParameter();
 
                 connection.Open();
-                SqlCommand cmd = new SqlCommand("Select * from Actor where firstName like @keyword", connection);
+                SqlCommand cmd = new SqlCommand("Select * from Actor where firstName like @keyword OR lastName like @keyword", connection);
                 sp.ParameterName = "@keyword".ToLower();
                 sp.Value = "%" + firstNameKeyword + "%";
                 cmd.Parameters.Add(sp);
@@ -151,22 +151,22 @@ namespace MovieNight
 
                 connection.Open();
                 SqlCommand cmd = new SqlCommand(
-                    "Select title, movieDescription, " +
+                    "Select title, movieDescription " +
                     "from Movie " +
                     "inner join Genre on Movie.movieId = Genre.movieId " +
                     "inner join genreType on genreType.genreId = Genre.genreId " +
                     "where genreType.genreName = @keyword",
                     connection);
 
-                sp.ParameterName = "@keyword".ToLower();
-                sp.Value = "'" + genreName + "'";
+                sp.ParameterName = "@keyword";
+                sp.Value = genreName;
                 cmd.Parameters.Add(sp);
 
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        movies.Add(new Movie(((DateTime)reader["release"]).ToShortDateString(), (int)(short)reader["movieId"], (string)reader["title"], (string)reader["movieDescription"]));
+                        movies.Add(new Movie((string)reader["title"], (string)reader["movieDescription"]));
                     }
                 }
                 return movies;
@@ -206,6 +206,42 @@ namespace MovieNight
                 }
                 return movies;
             }
+        }
+
+
+        public Actor InsertActor(Actor a)
+        {
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("insert into Actor(firstName, lastName) Output inserted.actorId values (@fn, @ln)", connection);
+
+                cmd.Parameters.Add(new SqlParameter("@fn", a.FirstName));
+                cmd.Parameters.Add(new SqlParameter("@ln", a.LastName));
+                cmd.ExecuteNonQuery();
+
+                a.ActorId = (int)(short)cmd.ExecuteScalar();
+                
+            }
+            return a;
+        }
+
+        public Movie InsertMovie(Movie m)
+        {
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("insert into Movie(title, release, movieDescription) Output inserted.movieId values (@title, @release, @md)", connection);
+
+                cmd.Parameters.Add(new SqlParameter("@title", m.Title));
+                cmd.Parameters.Add(new SqlParameter("@release", m.Description));
+                cmd.Parameters.Add(new SqlParameter("@md", m.ReleaseYear));
+                cmd.ExecuteNonQuery();
+
+                m.MovieId = (int)(short)cmd.ExecuteScalar();
+
+            }
+            return m;
         }
     }
 }

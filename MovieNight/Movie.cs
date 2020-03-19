@@ -55,5 +55,11 @@ namespace MovieNight
             Title = title;
             Description = description;
         }
+
+        public Movie(string title, string description)
+        {
+            Title = title;
+            Description = description;
+        }
     }
 }
