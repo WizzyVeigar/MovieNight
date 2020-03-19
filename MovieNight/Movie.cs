@@ -39,7 +39,7 @@ namespace MovieNight
             set { description = value; }
         }
 
-        private List<Genre> genres;
+        private List<Genre> genres = new List<Genre>();
 
         public List<Genre> Genres
         {
@@ -52,6 +52,13 @@ namespace MovieNight
         {
             ReleaseYear = releaseYear;
             MovieId = movieId;
+            Title = title;
+            Description = description;
+        }
+
+        public Movie(string releaseYear, string title, string description)
+        {
+            ReleaseYear = releaseYear;
             Title = title;
             Description = description;
         }

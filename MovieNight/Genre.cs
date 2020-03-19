@@ -33,5 +33,10 @@ namespace MovieNight
             GenreId = genreId;
             GenreName = genreName;
         }
+
+        public Genre(string genreName)
+        {
+            GenreName = genreName;
+        }
     }
 }

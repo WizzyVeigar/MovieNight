@@ -17,7 +17,7 @@ namespace MovieNight
 
         private DalManager()
         {
-        }               
+        }
         private static DalManager instance = null;
         public static DalManager Instance
         {
@@ -33,7 +33,7 @@ namespace MovieNight
 
 
         /// <summary>
-        /// Returns all movies from the Movie Table
+        /// Returns all movies from the Movie table
         /// </summary>
         /// <returns></returns>
         public List<Movie> GetMovies()
@@ -55,6 +55,11 @@ namespace MovieNight
 
 
 
+        /// <summary>
+        /// Gets all movies containing <paramref name="keyword"/>
+        /// </summary>
+        /// <param name="keyword"></param>
+        /// <returns></returns>
         public List<Movie> GetMovies(string keyword)
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
@@ -78,7 +83,10 @@ namespace MovieNight
                 }
             }
         }
-
+        /// <summary>
+        /// Gets all actors from the Actor table
+        /// </summary>
+        /// <returns></returns>
         public List<Actor> GetActors()
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
@@ -95,8 +103,12 @@ namespace MovieNight
                 return actors;
             }
         }
-
-        public List<Actor> GetActors(string firstNameKeyword)
+        /// <summary>
+        /// Gets all actors containing <paramref name="NameKeyword"/>
+        /// </summary>
+        /// <param name="NameKeyword"></param>
+        /// <returns></returns>
+        public List<Actor> GetActors(string NameKeyword)
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
@@ -106,7 +118,7 @@ namespace MovieNight
                 connection.Open();
                 SqlCommand cmd = new SqlCommand("Select * from Actor where firstName like @keyword OR lastName like @keyword", connection);
                 sp.ParameterName = "@keyword".ToLower();
-                sp.Value = "%" + firstNameKeyword + "%";
+                sp.Value = "%" + NameKeyword + "%";
                 cmd.Parameters.Add(sp);
 
                 using (SqlDataReader reader = cmd.ExecuteReader())
@@ -119,7 +131,10 @@ namespace MovieNight
                 return actors;
             }
         }
-
+        /// <summary>
+        /// Returns a list of all genres in the Database
+        /// </summary>
+        /// <returns></returns>
         public List<Genre> GetGenres()
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
@@ -201,14 +216,18 @@ namespace MovieNight
                     SqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        movie.Genres.Add(new Genre((int)(short)reader["genreId"],(string)reader["genreName"]));
+                        movie.Genres.Add(new Genre((int)(short)reader["genreId"], (string)reader["genreName"]));
                     }
                 }
                 return movies;
             }
         }
 
-
+        /// <summary>
+        /// Inserts an Actor into the db
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
         public Actor InsertActor(Actor a)
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
@@ -221,27 +240,100 @@ namespace MovieNight
                 cmd.ExecuteNonQuery();
 
                 a.ActorId = (int)(short)cmd.ExecuteScalar();
-                
+
             }
             return a;
         }
-
+        /// <summary>
+        /// Inserts a movie into the db
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
         public Movie InsertMovie(Movie m)
         {
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
                 connection.Open();
-                SqlCommand cmd = new SqlCommand("insert into Movie(title, release, movieDescription) Output inserted.movieId values (@title, @release, @md)", connection);
+                SqlCommand cmd = new SqlCommand("insert into Movie(title, release, movieDescription) Output inserted.movieId values (@title, @release, @desc)", connection);
 
                 cmd.Parameters.Add(new SqlParameter("@title", m.Title));
-                cmd.Parameters.Add(new SqlParameter("@release", m.Description));
-                cmd.Parameters.Add(new SqlParameter("@md", m.ReleaseYear));
-                cmd.ExecuteNonQuery();
+                cmd.Parameters.Add(new SqlParameter("@release", m.ReleaseYear));
+                cmd.Parameters.Add(new SqlParameter("@desc", m.Description));
 
                 m.MovieId = (int)(short)cmd.ExecuteScalar();
 
             }
             return m;
+        }
+        /// <summary>
+        /// Inserts a genre into the db
+        /// </summary>
+        /// <param name="g"></param>
+        /// <returns></returns>
+        public Genre InsertGenre(Genre g)
+        {
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("insert into genreType(genreName) Output inserted.genreId values (@genre)", connection);
+
+                cmd.Parameters.Add(new SqlParameter("@genre", g.GenreName));
+
+                g.GenreId = (int)(short)cmd.ExecuteScalar();
+
+            }
+            return g;
+        }
+        /// <summary>
+        /// Inserts references from what movie was added, to what genres it has
+        /// </summary>
+        /// <param name="m"></param>
+        public void InsertMovieGenres(Movie m)
+        {
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                SqlCommand cmd = new SqlCommand("insert into Genre(genreId, movieId) values (@genreId, @movieId)", connection);
+
+                for (int i = 0; i < m.Genres.Count; i++)
+                {
+                    cmd.Parameters.Add(new SqlParameter("@genreId", m.Genres[i].GenreId));
+                    cmd.Parameters.Add(new SqlParameter("@movieID", m.MovieId));
+                    cmd.ExecuteNonQuery();
+                    cmd.Parameters.Clear();
+                }
+
+
+            }
+        }
+
+
+        internal string UpdateActor(Actor a)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal string UpdateMovie(Movie m)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal string UpdateGenre(Genre g)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string DeleteActor(Actor a)
+        {
+            return a.GetFullName() + " was deleted";
+        }
+        public string DeleteMovie(Movie m)
+        {
+            return m.Title + " was deleted";
+        }
+        public string DeleteGenre(Genre g)
+        {
+            return g.GenreName + " was deleted"; 
         }
     }
 }

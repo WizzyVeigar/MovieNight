@@ -48,7 +48,47 @@ namespace MovieNight
 
         public Movie InsertMovie(Movie m)
         {
-            return DalManager.Instance.InsertMovie(m);
+            m = DalManager.Instance.InsertMovie(m);
+            InsertMovieGenres(m);
+            return m; 
+        }
+
+        public void InsertMovieGenres(Movie m)
+        {
+            DalManager.Instance.InsertMovieGenres(m);
+        }
+
+        public Genre InsertGenre(Genre g)
+        {
+            return DalManager.Instance.InsertGenre(g);
+        }
+
+        public string UpdateActor(Actor a)
+        {
+            return DalManager.Instance.UpdateActor(a);
+        }
+        public string UpdateMovie(Movie m)
+        {
+            return DalManager.Instance.UpdateMovie(m);
+        }
+        public string UpdateGenre(Genre g)
+        {
+            return DalManager.Instance.UpdateGenre(g);
+        }
+
+
+
+        public string DeleteActor(Actor a)
+        {
+            return DalManager.Instance.DeleteActor(a);
+        }
+        public string DeleteMovie(Movie m)
+        {
+            return DalManager.Instance.DeleteMovie(m);
+        }
+        public string DeleteGenre(Genre g)
+        {
+            return DalManager.Instance.DeleteGenre(g);
         }
     }
 }
